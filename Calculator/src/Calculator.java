@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
+import java.util.Objects;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicButtonUI;
@@ -34,9 +35,7 @@ public class Calculator {
     String B = null;
 
     Calculator() {
-        SwingUtilities.invokeLater(() -> {
-            createAndShowGUI();
-        });
+        SwingUtilities.invokeLater(this::createAndShowGUI);
     }
 
     private void createAndShowGUI() {
@@ -125,46 +124,28 @@ public class Calculator {
         buttonsPanel.setBackground(customBlack);
         frame.add(buttonsPanel);
 
-        for (int i = 0; i < buttonValues.length; i++) {
-            JButton button = new JButton();
-            String buttonValue = buttonValues[i];
-            button.setFont(new Font("Arial", Font.PLAIN, 30));
-            button.setText(buttonValue);
-            button.setFocusable(false);
-            button.setBorder(new LineBorder(customBlack));
-
-            if (Arrays.asList(topSymbols).contains(buttonValue)) {
-                button.setBackground(customLightGray);
-                button.setForeground(customBlack);
-            } else if (Arrays.asList(rightSymbols).contains(buttonValue)) {
-                button.setBackground(customOrange);
-                button.setForeground(Color.WHITE);
-            } else {
-                button.setBackground(customDarkGray);
-                button.setForeground(Color.WHITE);
-            }
-
+        for (String value : buttonValues) {
+            JButton button = getjButton(value);
             buttonsPanel.add(button);
-
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JButton button = (JButton) e.getSource();
                     String buttonValue = button.getText();
                     if (Arrays.asList(rightSymbols).contains(buttonValue)) {
-                        if (buttonValue == "=") {
+                        if (Objects.equals(buttonValue, "=")) {
                             if (A != null) {
                                 B = displayLabel.getText();
                                 double numA = Double.parseDouble(A);
                                 double numB = Double.parseDouble(B);
 
-                                if (operator == "+") {
-                                    displayLabel.setText(removeZeroDecimal(numA+numB));
-                                } else if (operator == "-") {
-                                    displayLabel.setText(removeZeroDecimal(numA-numB));
-                                } else if (operator == "x") {
-                                    displayLabel.setText(removeZeroDecimal(numA*numB));
-                                } else if (operator == "÷") {
-                                    displayLabel.setText(removeZeroDecimal(numA/numB));
+                                if (Objects.equals(operator, "+")) {
+                                    displayLabel.setText(removeZeroDecimal(numA + numB));
+                                } else if (Objects.equals(operator, "-")) {
+                                    displayLabel.setText(removeZeroDecimal(numA - numB));
+                                } else if (Objects.equals(operator, "x")) {
+                                    displayLabel.setText(removeZeroDecimal(numA * numB));
+                                } else if (Objects.equals(operator, "÷")) {
+                                    displayLabel.setText(removeZeroDecimal(numA / numB));
                                 }
                             }
                         } else if ("+-÷x".contains(buttonValue)) {
@@ -176,25 +157,25 @@ public class Calculator {
                             operator = buttonValue;
                         }
                     } else if (Arrays.asList(topSymbols).contains(buttonValue)) {
-                        if (buttonValue == "AC") {
+                        if (Objects.equals(buttonValue, "AC")) {
                             clearAll();
                             displayLabel.setText("0");
-                        } else if (buttonValue == "+/-") {
+                        } else if (Objects.equals(buttonValue, "+/-")) {
                             double numDisplay = Double.parseDouble(displayLabel.getText());
                             numDisplay *= -1;
                             displayLabel.setText(removeZeroDecimal(numDisplay));
-                        } else if (buttonValue == "%") {
+                        } else if (Objects.equals(buttonValue, "%")) {
                             double numDisplay = Double.parseDouble(displayLabel.getText());
                             numDisplay /= 100;
                             displayLabel.setText(removeZeroDecimal(numDisplay));
                         }
                     } else {
-                        if (buttonValue == ".") {
+                        if (Objects.equals(buttonValue, ".")) {
                             if (!displayLabel.getText().contains(buttonValue)) {
                                 displayLabel.setText(displayLabel.getText() + buttonValue);
                             }
                         } else if ("0123456789".contains(buttonValue)) {
-                            if (displayLabel.getText() == "0") {
+                            if (Objects.equals(displayLabel.getText(), "0")) {
                                 displayLabel.setText(buttonValue);
                             } else {
                                 displayLabel.setText(displayLabel.getText() + buttonValue);
@@ -206,6 +187,26 @@ public class Calculator {
         }
 
         frame.setVisible(true);
+    }
+
+    private JButton getjButton(String value) {
+        JButton button = new JButton();
+        button.setFont(new Font("Arial", Font.PLAIN, 30));
+        button.setText(value);
+        button.setFocusable(false);
+        button.setBorder(new LineBorder(customBlack));
+
+        if (Arrays.asList(topSymbols).contains(value)) {
+            button.setBackground(customLightGray);
+            button.setForeground(customBlack);
+        } else if (Arrays.asList(rightSymbols).contains(value)) {
+            button.setBackground(customOrange);
+            button.setForeground(Color.WHITE);
+        } else {
+            button.setBackground(customDarkGray);
+            button.setForeground(Color.WHITE);
+        }
+        return button;
     }
 
     private JButton createWindowButton(Color color) {
